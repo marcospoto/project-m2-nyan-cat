@@ -15,6 +15,30 @@ class Engine {
     // that contains instances of the Enemy class
     this.enemies = [];
     // We add the background image to the game
+    this.reset = false;
+    this.gamerunning = true;
+    this.score = new Text(this.root, 0, 20);
+    this.score.update("");
+
+    let totalSeconds = 0;
+    let myTimer = () => {
+      if (!this.isPlayerDead()) {
+        totalSeconds += 1;
+        let seconds = totalSeconds;
+        let time = seconds;
+        this.score.update(time);
+      }
+    };
+    this.scoreInterval = setInterval(myTimer, 50);
+
+    let newGame = new Restart(this.root);
+    newGame.update("New Game");
+    newGame.start();
+
+    // if (gameEngine.gameLoop()) {
+    //   this.newGame.update.display.none;
+    // }
+
     addBackground(this.root);
   }
 
@@ -57,17 +81,45 @@ class Engine {
     // We check if the player is dead. If he is, we alert the user
     // and return from the method (Why is the return statement important?)
     if (this.isPlayerDead()) {
-      window.alert('Game over');
+      let over = new Text(this.root, 0, 0);
+      over.center();
+      over.update("Game Over");
+      let restart = new Restart(this.root);
+      restart.update("Play Again?");
+      restart.center();
+      restart.reset();
+
       return;
     }
-
-    // If the player is not dead, then we put a setTimeout to run the gameLoop in 20 milliseconds
-    setTimeout(this.gameLoop, 20);
+    if (this.gamerunning) {
+      // If the player is not dead, then we put a setTimeout to run the gameLoop in 20 milliseconds
+      // let score = new Score(this.root);
+      // score.time();
+      setTimeout(this.gameLoop, 20);
+    }
   };
 
   // This method is not implemented correctly, which is why
   // the burger never dies. In your exercises you will fix this method.
   isPlayerDead = () => {
-    return false;
+    let dead = false;
+    this.enemies.forEach((enemy) => {
+      console.log(enemy);
+      console.log(this.player);
+      let rect1 = this.player;
+      let rect2 = enemy;
+      rect1.y = GAME_HEIGHT - PLAYER_HEIGHT - 10;
+      if (
+        rect1.x < rect2.x + ENEMY_WIDTH &&
+        rect1.x + PLAYER_WIDTH > rect2.x &&
+        rect1.y < rect2.y + ENEMY_HEIGHT &&
+        rect1.y + PLAYER_HEIGHT > rect2.y
+      ) {
+        // collision detected!
+        dead = true;
+      }
+    });
+
+    return dead;
   };
 }
